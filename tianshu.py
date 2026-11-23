@@ -5,12 +5,12 @@
 
 工程映射：总领调度。
 
-边界：本件为算子骨架 v0——接口先立、实现随进化轮补齐；遵循元法第四条「只增不覆盖」，
+边界：本件为算子 v1——骨架桩已按命名映射补齐实现；遵循元法第四条「只增不覆盖」，
 方法只增不改名不删，行为变更走新版本；凭据不入档，宣称与事实分离。
 """
 
 class Tianshu:
-    """天枢（TIANSHU）算子骨架 v0。"""
+    """天枢（TIANSHU）算子 v1。"""
 
     ANCHOR = "Ω₀⊂⊙∞⊂Ω｜DID-BR-000002"
     CODE = "TIANSHU"
@@ -18,6 +18,7 @@ class Tianshu:
     def __init__(self, config=None):
         self.config = dict(config or {})
         self.events = []  # 只增不覆盖：会话内事件留痕
+        self.components = {}
 
     def describe(self):
         """构件名帖：名、代号、职责、铭文、体系锚。"""
@@ -31,9 +32,18 @@ class Tianshu:
         }
 
     def register_component(self, name, handler):
-        """登记构件处理器，返回登记序号（只增不覆盖）（骨架桩：实现随进化轮补齐）。"""
-        raise NotImplementedError("TIANSHU.register_component 骨架桩，候进化轮补齐")
+        """众柄归枢：构件登记。"""
+        if not callable(handler):
+            raise ValueError("构件须可调用")
+        self.components[name] = handler
+        self.events.append({"event": "register_component", "name": name})
+        return name
 
     def dispatch(self, task):
-        """按谱系把任务路由到责任构件；骨架期返回路由意向，不实际执行（骨架桩：实现随进化轮补齐）。"""
-        raise NotImplementedError("TIANSHU.dispatch 骨架桩，候进化轮补齐")
+        """枢居中央：按构件名分派任务。"""
+        name = (task or {}).get("component")
+        if name not in self.components:
+            raise KeyError("枢不知此柄： %s" % name)
+        result = self.components[name]((task or {}).get("payload"))
+        self.events.append({"event": "dispatch", "component": name})
+        return result
